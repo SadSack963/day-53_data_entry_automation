@@ -189,10 +189,17 @@ def read_web_file(file, url):
 
 
 def get_search_links():
-    list_links = [a["href"] for a in search_results.findAll("a", class_="list-card-link list-card-link-top-margin")]
+    """
+    Search the HTML for anchor tags with specific class.\n
+    Form these into a list.
+
+    :return: list of URLs
+    """
+    list_links = [a["href"] for a in search_results.find_all("a", class_="list-card-link list-card-link-top-margin")]
     # print(f"list_links = {list_links}\n\n")
 
-    # Some links are broken
+    # Some links are broken,i.e. an apartment block with multiple listings...
+    # Each apartment then has it's own "homedetails" on the destination page.
     #   e.g. '/b/1450-castro-st-san-francisco-ca-5YVg2f/'
     #        should be 'https://www.zillow.com/b/1450-castro-st-san-francisco-ca-5YVg2f/'
     for index in range(len(list_links)):
@@ -213,7 +220,8 @@ if __name__ == "__main__":
     # print(f"search_results = {search_results}\n\n")
 
     # Create a list of URL links for all the Search Listings.
-    get_search_links()
+    list_urls = get_search_links()
+    # print(f"list_urls = {list_urls}\n\n")
 
     # TODO Create a list of prices for all the listings you scraped.
 
