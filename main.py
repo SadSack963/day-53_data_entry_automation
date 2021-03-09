@@ -38,6 +38,47 @@ ZILLOW_URL = 'https://www.zillow.com/homes/for_rent/1-_beds/?searchQueryState={'
 WEB_FILE = "./data/zillow.html"
 
 
+def fill_in_form():
+    # For each item in the Search Listing
+    for listing in range(len(list_prices)):
+        # print(f"Filling form with details for listing {listing}")
+
+        # Get a list of form questions
+        list_elements = form.find_elements("css selector", "div.freebirdFormviewerComponentsQuestionBaseRoot")
+        # Enter details into form
+        for index in range(len(list_elements)):
+            # Get text contents of element
+            string: str = list_elements[index].text
+            # Detect which question we are working with
+            # The order of questions on the form is accounted for
+            if string.startswith("Renting Cost"):
+                list_elements[index].find_element_by_tag_name("input").send_keys(list_prices[listing])
+                pass
+            elif string.startswith("Property Address"):
+                list_elements[index].find_element_by_tag_name("input").send_keys(list_addresses[listing])
+                pass
+            elif string.startswith("Link to Web Page"):
+                list_elements[index].find_element_by_tag_name("textarea").send_keys(list_urls[listing])
+                pass
+            else:
+                print("HELP! I'm Lost!")
+                exit()
+        # Find the submit button
+        x = form.find_elements("css selector",
+                               "div[role='button'][class*='freebirdFormviewerViewNavigationSubmitButton']")
+        x[0].click()
+
+        # Wait for new page to load
+        sleep(2)
+
+        # Find anchor tag to "Submit another response"
+        x = form.find_elements("link text", "Submit another response")
+        x[0].click()
+
+        # Wait for new page to load
+        sleep(2)
+
+
 if __name__ == "__main__":
     # Use BeautifulSoup to retrieve the Zillow web page
     soup = z.read_web_file(file=WEB_FILE, url=ZILLOW_URL)
@@ -60,47 +101,12 @@ if __name__ == "__main__":
     list_addresses = z.get_addresses(html=search_results)
     # print(f"list_addresses = {list_addresses}\n\n")
 
-    # TODO Use selenium to fill in the Google Form "San Francisco Renting"
+    # Use selenium to fill in the Google Form "San Francisco Renting"
     # Load the Google Form web page
     form = s.Form(url=FORM_URL, browser="opera")
 
-    # Enter details into Google Form for each Search Listing
-    for listing in range(len(list_prices)):
-        print(listing)
-
-        # Get a list of form questions
-        list_elements = form.find_elements("css selector", "div.freebirdFormviewerComponentsQuestionBaseRoot")
-
-        for index in range(len(list_elements)):
-            # Get text contents of element
-            string: str = list_elements[index].text
-            # Detect which question we are working with
-            if string.startswith("Renting Cost"):
-                list_elements[index].find_element_by_tag_name("input").send_keys(list_prices[listing])
-                pass
-            elif string.startswith("Property Address"):
-                list_elements[index].find_element_by_tag_name("input").send_keys(list_addresses[listing])
-                pass
-            elif string.startswith("Link to Web Page"):
-                list_elements[index].find_element_by_tag_name("textarea").send_keys(list_urls[listing])
-                pass
-            else:
-                print("HELP! I'm Lost!")
-                exit()
-        # Find the submit button
-        x = form.find_elements("css selector", "div[role='button'][class='appsMaterialWizButtonEl appsMaterialWizButtonPaperbuttonEl appsMaterialWizButtonPaperbuttonFilled freebirdFormviewerViewNavigationSubmitButton freebirdThemedFilledButtonM2']")
-        # print(x)
-        x[0].click()
-
-        # Wait for new page to load
-        sleep(2)
-
-        # Find anchor tag to "Submit another response"
-        x = form.find_elements("link text", "Submit another response")
-        x[0].click()
-
-        # Wait for new page to load
-        sleep(2)
+    # Enter details into Google Form
+    fill_in_form()
 
     # Close the browser and terminate the WebDriver
     form.driver.quit()
