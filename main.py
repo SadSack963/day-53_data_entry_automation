@@ -188,12 +188,32 @@ def read_web_file(file, url):
         return BeautifulSoup(content, "html.parser")
 
 
+def get_search_links():
+    list_links = [a["href"] for a in search_results.findAll("a", class_="list-card-link list-card-link-top-margin")]
+    # print(f"list_links = {list_links}\n\n")
+
+    # Some links are broken
+    #   e.g. '/b/1450-castro-st-san-francisco-ca-5YVg2f/'
+    #        should be 'https://www.zillow.com/b/1450-castro-st-san-francisco-ca-5YVg2f/'
+    for index in range(len(list_links)):
+        if not list_links[index].startswith("http"):
+            list_links[index] = 'https://www.zillow.com' + list_links[index]
+            # print(f"Corrected Link = {list_links[index]}\n\n")
+    # print(f"list_links = {list_links}\n\n")
+    return list_links
+
+
 if __name__ == "__main__":
     # Use BeautifulSoup to retrieve the Zillow web page
     soup = read_web_file(file=WEB_FILE, url=ZILLOW_URL)
     # print(f"result = {soup}")
 
-    # TODO Create a list of links for all the listings you scraped.
+    # Get the HTML for the Search Listings
+    search_results = soup.find(name="ul", class_="photo-cards photo-cards_wow photo-cards_short")
+    # print(f"search_results = {search_results}\n\n")
+
+    # Create a list of URL links for all the Search Listings.
+    get_search_links()
 
     # TODO Create a list of prices for all the listings you scraped.
 
