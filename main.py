@@ -1,9 +1,7 @@
-from bs4 import BeautifulSoup
-from selenium import webdriver, common
-from selenium.webdriver.common.keys import Keys
-import os
-from dotenv import load_dotenv  # pip install python-dotenv
 from time import sleep
+import beautifulsoup_zillow as z
+import selenium_google_forms as s
+from selenium.webdriver.common.keys import Keys
 
 
 FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLScHVLX-4qmgXvVSB7nebMtvHCyO5ncn63-y-AES0BM602cIjQ/viewform" \
@@ -40,224 +38,70 @@ ZILLOW_URL = 'https://www.zillow.com/homes/for_rent/1-_beds/?searchQueryState={'
 WEB_FILE = "./data/zillow.html"
 
 
-# Use Selenium to fill in the form you created
-
-class Form:
-    def __init__(self, url, browser: str = "chrome"):
-        browser = browser.lower()
-        # Declare variables
-        self.chrome_driver_path = self.firefox_driver_path = self.opera_driver_path = ""
-        # self.driver = webdriver.Chrome()  # Windows error: 'chromedriver' executable needs to be in PATH.
-
-        # Get the path to the WebDriver and environment variables
-        #   depending upon the operating system
-        self.get_os_path()
-        self.get_driver(browser)
-        self.driver.get(url)
-
-    def get_os_path(self):
-        # Detect Operating System and set paths to local files
-        import platform
-        if platform.system() == "Windows":
-            self.chrome_driver_path = "E:/Python/WebDriver/chromedriver.exe"
-            self.firefox_driver_path = "E:/Python/WebDriver/geckodriver.exe"
-            self.opera_driver_path = "E:/Python/WebDriver/operadriver.exe"
-            load_dotenv("E:/Python/EnvironmentVariables/.env")
-        elif platform.system() == "Linux":
-            # (Set WebDriver file permissions to 755)
-            # -rwxr-xr-x 1 john john 11755976 Jan 27 03:32 chromedriver
-            # -rwxr-xr-x 1 john john  7965656 Jan 14 08:51 geckodriver
-            # -rwxr-xr-x 1 john john 14990832 Feb  3 10:29 operadriver
-            self.chrome_driver_path = "/home/john/Development/Python/WebDriver/chromedriver"
-            self.firefox_driver_path = "/home/john/Development/Python//WebDriver/geckodriver"
-            self.opera_driver_path = "/home/john/Development/Python/WebDriver/operadriver"
-            load_dotenv("/media/sf_Python/EnvironmentVariables/.env")
-        else:
-            print("OS not supported!")
-            exit()
-
-    def get_driver(self, b):
-        if b == "chrome":
-            self.driver = webdriver.Chrome(executable_path=self.chrome_driver_path)
-        elif b == "firefox":
-            self.driver = webdriver.Firefox(executable_path=self.firefox_driver_path)
-        elif b == "opera":
-            self.driver = webdriver.Opera(executable_path=self.opera_driver_path)
-        else:
-            print(f"Invalid browser \"{b}\".\nOnly Chrome, Firefox and Opera are configured.")
-            exit()
-
-    def find_elements(self, method: str, specifier: str):
-        """
-        Find all elements on a web page.
-
-        These are the attributes available for method:
-            ID = "id",
-            XPATH = "xpath",
-            LINK_TEXT = "link text",
-            PARTIAL_LINK_TEXT = "partial link text",
-            NAME = "name",
-            TAG_NAME = "tag name",
-            CLASS_NAME = "class name",
-            CSS_SELECTOR = "css selector".
-
-        :param method: search method
-        :param specifier: search attribute
-        :return:  list of elements found
-        """
-        by = method.lower()
-        list_elements = []
-        for _ in range(10):
-            try:
-                if by == "id":
-                    list_elements = self.driver.find_elements_by_id(specifier)
-                elif by == "xpath":
-                    list_elements = self.driver.find_elements_by_xpath(specifier)
-                elif by == "link text":
-                    list_elements = self.driver.find_elements_by_link_text(specifier)
-                elif by == "partial link text":
-                    list_elements = self.driver.find_elements_by_partial_link_text(specifier)
-                elif by == "name":
-                    list_elements = self.driver.find_elements_by_name(specifier)
-                elif by == "tag name":
-                    list_elements = self.driver.find_elements_by_tag_name(specifier)
-                elif by == "class name":
-                    list_elements = self.driver.find_elements_by_class_name(specifier)
-                elif by == "css selector":
-                    list_elements = self.driver.find_elements_by_css_selector(specifier)
-                else:
-                    print(f"Invalid search method {by}")
-                    exit()
-                return list_elements
-            except common.exceptions.ElementNotInteractableException:
-                print("Element Not Interactable Exception")
-            except common.exceptions.NoSuchElementException:
-                print("No Such Element Exception")
-            finally:
-                sleep(1)
-        print(f"Unable to find any element by \"{by}\" with \"{specifier}\"")
-
-
-# Use BeautifulSoup/Requests to scrape all the listings from the Zillow web address
-
-def get_web_page(file, url):
-    """
-    Retrieve requested web page\n
-    Use library render() to execute the page's JavaScript\n
-    Save the rendered web page to web file
-
-    :param file: file where web page is saved
-    :param url: URL of web page to retrieve
-    :return: nothing
-    """
-    from requests_html import HTMLSession
-
-    # Create an HTML Session object
-    session = HTMLSession()
-    # Use the object above to connect to needed webpage
-    response = session.get(url)
-    # Run JavaScript code on webpage
-    response.html.render()
-
-    # Save web page to file
-    # print("Saving to file")
-    with open(file, mode="w", encoding="utf-8") as fp:
-        fp.write(response.html.html)
-
-
-def read_web_file(file, url):
-    """
-    If web file does not exist, then retrieve web page\n
-    Open web file and return a BeautifulSoup object (HTML)
-
-    :param file:  file where web page is saved
-    :param url:  URL of web page to retrieve
-    :return: HTML soup
-    """
-    try:
-        open(file)
-    except FileNotFoundError:
-        get_web_page(file, url)
-    else:
-        pass
-    finally:
-        # Read the web page from file
-        # print("Reading from file")
-        with open(file, mode="r", encoding="utf-8") as fp:
-            content = fp.read()
-        return BeautifulSoup(content, "html.parser")
-
-
-def get_search_links():
-    """
-    Search the HTML for anchor tags with tabindex="0".\n
-    Form these into a list.
-
-    :return: list of URLs
-    """
-    list_links = [a["href"] for a in search_results.find_all("a", tabindex="0")]
-    # print(f"list_links = {list_links}\n\n")
-
-    # Some links are broken,i.e. an apartment block with multiple listings...
-    # Each apartment then has it's own "homedetails" on the destination page.
-    #   e.g. '/b/1450-castro-st-san-francisco-ca-5YVg2f/'
-    #        should be 'https://www.zillow.com/b/1450-castro-st-san-francisco-ca-5YVg2f/'
-    for index in range(len(list_links)):
-        if not list_links[index].startswith("http"):
-            list_links[index] = 'https://www.zillow.com' + list_links[index]
-            # print(f"Corrected Link = {list_links[index]}\n\n")
-    # print(f"list_links = {list_links}\n\n")
-    return list_links
-
-
-def get_addresses():
-    """
-    Search the HTML for address tags with specific class.\n
-    Form these into a list.
-
-    :return: list of addresses
-    """
-    list_addr = [a.text for a in search_results.find_all("address", class_="list-card-addr")]
-    # print(f"list_addresses = {list_addresses}\n\n")
-
-    return list_addr
-
-
-def get_prices():
-    """
-    Search the HTML for div tags with specific class.\n
-    Form these into a list.
-
-    :return: list of prices
-    """
-    list_cost = [a.text for a in search_results.find_all("div", class_="list-card-price")]
-    # print(f"list_cost = {list_cost}\n\n")
-
-    return list_cost
-
-
 if __name__ == "__main__":
     # Use BeautifulSoup to retrieve the Zillow web page
-    soup = read_web_file(file=WEB_FILE, url=ZILLOW_URL)
+    soup = z.read_web_file(file=WEB_FILE, url=ZILLOW_URL)
     # print(f"result = {soup}")
 
-    # Get the HTML for the Search Listings
+    # Get the HTML for the Search Listings Unordered List
     # Speed up Beautiful Soup by only parsing the parts of the document we need
     search_results = soup.find(name="ul", class_="photo-cards photo-cards_wow photo-cards_short")
     # print(f"search_results = {search_results}\n\n")
 
     # Create a list of URL links for all the Search Listings.
-    list_urls = get_search_links()
-    print(f"list_urls = {list_urls}\n\n")
+    list_urls = z.get_search_links(html=search_results)
+    # print(f"list_urls = {list_urls}\n\n")
 
     # reate a list of prices for all the Search Listings.
-    list_prices = get_prices()
-    print(f"list_prices = {list_prices}\n\n")
+    list_prices = z.get_prices(html=search_results)
+    # print(f"list_prices = {list_prices}\n\n")
 
     # Create a list of addresses for all the Search Listings.
-    list_addresses = get_addresses()
-    print(f"list_addresses = {list_addresses}\n\n")
+    list_addresses = z.get_addresses(html=search_results)
+    # print(f"list_addresses = {list_addresses}\n\n")
 
     # TODO Use selenium to fill in the Google Form "San Francisco Renting"
-    # form = Form(url=FORM_URL, browser="opera")
+    # Load the Google Form web page
+    form = s.Form(url=FORM_URL, browser="opera")
+
+    # Enter details into Google Form for each Search Listing
+    for listing in range(len(list_prices)):
+        print(listing)
+
+        # Get a list of form questions
+        list_elements = form.find_elements("css selector", "div.freebirdFormviewerComponentsQuestionBaseRoot")
+
+        for index in range(len(list_elements)):
+            # Get text contents of element
+            string: str = list_elements[index].text
+            # Detect which question we are working with
+            if string.startswith("Renting Cost"):
+                list_elements[index].find_element_by_tag_name("input").send_keys(list_prices[listing])
+                pass
+            elif string.startswith("Property Address"):
+                list_elements[index].find_element_by_tag_name("input").send_keys(list_addresses[listing])
+                pass
+            elif string.startswith("Link to Web Page"):
+                list_elements[index].find_element_by_tag_name("textarea").send_keys(list_urls[listing])
+                pass
+            else:
+                print("HELP! I'm Lost!")
+                exit()
+        # Find the submit button
+        x = form.find_elements("css selector", "div[role='button'][class='appsMaterialWizButtonEl appsMaterialWizButtonPaperbuttonEl appsMaterialWizButtonPaperbuttonFilled freebirdFormviewerViewNavigationSubmitButton freebirdThemedFilledButtonM2']")
+        # print(x)
+        x[0].click()
+
+        # Wait for new page to load
+        sleep(2)
+
+        # Find anchor tag to "Submit another response"
+        x = form.find_elements("link text", "Submit another response")
+        x[0].click()
+
+        # Wait for new page to load
+        sleep(2)
+
+    # Close the browser and terminate the WebDriver
+    form.driver.quit()
 
