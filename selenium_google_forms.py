@@ -1,5 +1,4 @@
 from selenium import webdriver, common
-from selenium.webdriver.common.keys import Keys
 import os
 from dotenv import load_dotenv  # pip install python-dotenv
 from time import sleep

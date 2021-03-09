@@ -1,7 +1,6 @@
 from time import sleep
 import beautifulsoup_zillow as z
 import selenium_google_forms as s
-from selenium.webdriver.common.keys import Keys
 
 
 FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLScHVLX-4qmgXvVSB7nebMtvHCyO5ncn63-y-AES0BM602cIjQ/viewform" \
