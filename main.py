@@ -190,12 +190,12 @@ def read_web_file(file, url):
 
 def get_search_links():
     """
-    Search the HTML for anchor tags with specific class.\n
+    Search the HTML for anchor tags with tabindex="0".\n
     Form these into a list.
 
     :return: list of URLs
     """
-    list_links = [a["href"] for a in search_results.find_all("a", class_="list-card-link list-card-link-top-margin")]
+    list_links = [a["href"] for a in search_results.find_all("a", tabindex="0")]
     # print(f"list_links = {list_links}\n\n")
 
     # Some links are broken,i.e. an apartment block with multiple listings...
@@ -210,22 +210,53 @@ def get_search_links():
     return list_links
 
 
+def get_addresses():
+    """
+    Search the HTML for address tags with specific class.\n
+    Form these into a list.
+
+    :return: list of addresses
+    """
+    list_addr = [a.text for a in search_results.find_all("address", class_="list-card-addr")]
+    # print(f"list_addresses = {list_addresses}\n\n")
+
+    return list_addr
+
+
+def get_prices():
+    """
+    Search the HTML for div tags with specific class.\n
+    Form these into a list.
+
+    :return: list of prices
+    """
+    list_cost = [a.text for a in search_results.find_all("div", class_="list-card-price")]
+    # print(f"list_cost = {list_cost}\n\n")
+
+    return list_cost
+
+
 if __name__ == "__main__":
     # Use BeautifulSoup to retrieve the Zillow web page
     soup = read_web_file(file=WEB_FILE, url=ZILLOW_URL)
     # print(f"result = {soup}")
 
     # Get the HTML for the Search Listings
+    # Speed up Beautiful Soup by only parsing the parts of the document we need
     search_results = soup.find(name="ul", class_="photo-cards photo-cards_wow photo-cards_short")
     # print(f"search_results = {search_results}\n\n")
 
     # Create a list of URL links for all the Search Listings.
     list_urls = get_search_links()
-    # print(f"list_urls = {list_urls}\n\n")
+    print(f"list_urls = {list_urls}\n\n")
 
-    # TODO Create a list of prices for all the listings you scraped.
+    # reate a list of prices for all the Search Listings.
+    list_prices = get_prices()
+    print(f"list_prices = {list_prices}\n\n")
 
-    # TODO Create a list of addresses for all the listings you scraped.
+    # Create a list of addresses for all the Search Listings.
+    list_addresses = get_addresses()
+    print(f"list_addresses = {list_addresses}\n\n")
 
     # TODO Use selenium to fill in the Google Form "San Francisco Renting"
     # form = Form(url=FORM_URL, browser="opera")
