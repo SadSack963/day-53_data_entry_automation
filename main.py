@@ -3,6 +3,8 @@ import beautifulsoup_zillow as z
 import selenium_google_forms as s
 
 
+# Forms Dashboard: https://docs.google.com/forms/u/0/
+# Spreadsheet: https://docs.google.com/spreadsheets/d/1fiWcbadPjHeG84kCJR47IEP16liRuKduja47_CNnbew/edit?resourcekey#gid=119844546
 FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLScHVLX-4qmgXvVSB7nebMtvHCyO5ncn63-y-AES0BM602cIjQ/viewform" \
            "?usp=sf_link"
 
@@ -10,25 +12,25 @@ ZILLOW_URL = 'https://www.zillow.com/homes/for_rent/1-_beds/?searchQueryState={'
              '"pagination":{},' \
              '"usersSearchTerm":null,' \
              '"mapBounds":{' \
-             '"west":-122.56276167822266,' \
-             '"east":-122.30389632177734,' \
-             '"south":37.69261345230467,' \
-             '"north":37.857877098316834' \
+                 '"west":-122.56276167822266,' \
+                 '"east":-122.30389632177734,' \
+                 '"south":37.69261345230467,' \
+                 '"north":37.857877098316834' \
              '},' \
              '"isMapVisible":true,' \
              '"filterState":{' \
-             '"fr":{"value":true},' \
-             '"fsba":{"value":false},' \
-             '"fsbo":{"value":false},' \
-             '"nc":{"value":false},' \
-             '"cmsn":{"value":false},' \
-             '"auc":{"value":false},' \
-             '"fore":{"value":false},' \
-             '"pmf":{"value":false},' \
-             '"pf":{"value":false},' \
-             '"mp":{"max":3000},' \
-             '"price":{"max":872627},' \
-             '"beds":{"min":1}' \
+                 '"fr":{"value":true},' \
+                 '"fsba":{"value":false},' \
+                 '"fsbo":{"value":false},' \
+                 '"nc":{"value":false},' \
+                 '"cmsn":{"value":false},' \
+                 '"auc":{"value":false},' \
+                 '"fore":{"value":false},' \
+                 '"pmf":{"value":false},' \
+                 '"pf":{"value":false},' \
+                 '"mp":{"max":3000},' \
+                 '"price":{"max":872627},' \
+                 '"beds":{"min":1}' \
              '},' \
              '"isListVisible":true,' \
              '"mapZoom":12' \
@@ -109,4 +111,3 @@ if __name__ == "__main__":
 
     # Close the browser and terminate the WebDriver
     form.driver.quit()
-

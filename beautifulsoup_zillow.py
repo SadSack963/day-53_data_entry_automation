@@ -15,6 +15,7 @@ def get_web_page(file, url):
     """
 
     # NOTE: This may not work because of anti-robot Captcha
+    # pip install requests-html
     from requests_html import HTMLSession
 
     # Create an HTML Session object
@@ -102,4 +103,3 @@ def get_prices(html):
     # print(f"list_cost = {list_cost}\n\n")
 
     return list
-
