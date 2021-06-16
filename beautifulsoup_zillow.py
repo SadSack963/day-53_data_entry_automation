@@ -14,21 +14,43 @@ def get_web_page(file, url):
     :return: nothing
     """
 
-    # NOTE: This may not work because of anti-robot Captcha
-    # pip install requests-html
-    from requests_html import HTMLSession
+    # NOTE: requests-html may not work any more because of anti-robot Captcha
+    #
+    # # pip install requests-html
+    # from requests_html import HTMLSession
+    #
+    # # Create an HTML Session object
+    # session = HTMLSession()
+    # # Use the object above to connect to needed webpage
+    # response = session.get(url)
+    # # Run JavaScript code on webpage
+    # response.html.render()
+    #
+    # # Save web page to file
+    # # print("Saving to file")
+    # with open(file, mode="w", encoding="utf-8") as fp:
+    #     fp.write(response.html.html)
 
-    # Create an HTML Session object
-    session = HTMLSession()
-    # Use the object above to connect to needed webpage
-    response = session.get(url)
-    # Run JavaScript code on webpage
-    response.html.render()
+    # Alternative using selenium to render the web page in the browser before saving to file
+    from selenium import webdriver
 
-    # Save web page to file
-    # print("Saving to file")
-    with open(file, mode="w", encoding="utf-8") as fp:
-        fp.write(response.html.html)
+    # chrome_driver_path = "E:/Python/WebDriver/chromedriver.exe"
+    # driver = webdriver.Chrome(executable_path=chrome_driver_path)
+    # firefox_driver_path = "E:/Python/WebDriver/geckodriver.exe"
+    # driver = webdriver.Firefox(executable_path=firefox_driver_path)
+    opera_driver_path = "E:/Python/WebDriver/operadriver.exe"
+    driver = webdriver.Opera(executable_path=opera_driver_path)
+
+    driver.get(url)
+
+    go = input("Allow the page to completely render in the browser.\nEnter Y to save the web page! ").lower()
+    if go == "y":
+        html_source = driver.page_source
+
+        # Save web page to file
+        # print("Saving to file")
+        with open(file, mode="w", encoding="utf-8") as fp:
+            fp.write(html_source)
 
 
 def read_web_file(file, url):
