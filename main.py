@@ -94,21 +94,24 @@ if __name__ == "__main__":
     # Create a list of URL links for all the Search Listings.
     list_urls = z.get_search_links(html=search_results)
     # print(f"list_urls = {list_urls}\n\n")
+    print(len(list_urls))
 
     # reate a list of prices for all the Search Listings.
     list_prices = z.get_prices(html=search_results)
     # print(f"list_prices = {list_prices}\n\n")
+    print(len(list_prices))
 
     # Create a list of addresses for all the Search Listings.
     list_addresses = z.get_addresses(html=search_results)
     # print(f"list_addresses = {list_addresses}\n\n")
+    print(len(list_prices))
 
-    # Use selenium to fill in the Google Form "San Francisco Renting"
-    # Load the Google Form web page
-    form = s.Form(url=FORM_URL, browser="opera")
-
-    # Enter details into Google Form
-    fill_in_form()
-
-    # Close the browser and terminate the WebDriver
-    form.driver.quit()
+    # # Use selenium to fill in the Google Form "San Francisco Renting"
+    # # Load the Google Form web page
+    # form = s.Form(url=FORM_URL, browser="opera")
+    #
+    # # Enter details into Google Form
+    # fill_in_form()
+    #
+    # # Close the browser and terminate the WebDriver
+    # form.driver.quit()

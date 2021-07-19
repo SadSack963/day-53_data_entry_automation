@@ -43,8 +43,12 @@ def get_web_page(file, url):
 
     driver.get(url)
 
-    go = input("Allow the page to completely render in the browser.\nEnter Y to save the web page! ").lower()
-    if go == "y":
+    # TODO: Find a way to get selenium to scroll down the page, maybe using .sendkeys.PAGE_DOWN
+
+    ready = input("Scroll down to the bottom of the page.\n"
+                  "Allow the page to completely render in the browser.\n"
+                  "Enter Y to save the web page! ").lower()
+    if ready == "y":
         html_source = driver.page_source
 
         # Save web page to file
